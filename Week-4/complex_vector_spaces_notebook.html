@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Complex Vector Spaces — MSE Student Notebook</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1e2530;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #f78166;
+    --accent3: #56d364;
+    --accent4: #d2a8ff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --highlight: #ffa657;
+    --card-blue: #0d2137;
+    --card-purple: #1a1040;
+    --card-green: #0a2218;
+    --card-orange: #291600;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #0d1f3c 50%, #160d27 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 360px; height: 360px;
+    background: radial-gradient(circle, rgba(88,166,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(210,168,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 5vw, 54px);
+    line-height: 1.15;
+    color: var(--text);
+    max-width: 700px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 560px;
+    position: relative;
+    z-index: 1;
+    line-height: 1.6;
+  }
+  .badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .badge {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .badge-blue { border-color: var(--accent); color: var(--accent); }
+  .badge-purple { border-color: var(--accent4); color: var(--accent4); }
+  .badge-green { border-color: var(--accent3); color: var(--accent3); }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* TABLE OF CONTENTS */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+  .toc-title {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .toc-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 32px;
+  }
+  .toc-list li a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toc-list li a:hover { color: var(--text); }
+  .toc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 20px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 56px;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    min-width: 28px;
+    padding-top: 4px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  .section-intro {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.7;
+  }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    border-left: 3px solid;
+    position: relative;
+  }
+  .callout-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .callout-idea { background: var(--card-blue); border-color: var(--accent); }
+  .callout-idea .callout-label { color: var(--accent); }
+  .callout-def { background: var(--card-purple); border-color: var(--accent4); }
+  .callout-def .callout-label { color: var(--accent4); }
+  .callout-tip { background: var(--card-green); border-color: var(--accent3); }
+  .callout-tip .callout-label { color: var(--accent3); }
+  .callout-example { background: var(--card-orange); border-color: var(--highlight); }
+  .callout-example .callout-label { color: var(--highlight); }
+  .callout p { font-size: 14.5px; color: var(--text); line-height: 1.7; }
+  .callout p + p { margin-top: 8px; }
+
+  /* MATH DISPLAY */
+  .math-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin: 16px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--accent4);
+    overflow-x: auto;
+  }
+  .math-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* MATRIX DISPLAY */
+  .matrix-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .matrix-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .matrix-bracket {
+    position: relative;
+    display: inline-block;
+  }
+  .matrix-bracket::before,
+  .matrix-bracket::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 6px;
+    border: 2px solid var(--accent4);
+  }
+  .matrix-bracket::before { left: 0; border-right: none; border-radius: 2px 0 0 2px; }
+  .matrix-bracket::after { right: 0; border-left: none; border-radius: 0 2px 2px 0; }
+  .matrix-inner {
+    padding: 12px 18px;
+    display: grid;
+    gap: 6px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent4);
+    text-align: right;
+  }
+  .matrix-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
+  }
+  .matrix-op {
+    font-size: 24px;
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  /* INTERACTIVE: QUIZ */
+  .quiz-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .quiz-q {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .quiz-opt {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    font-family: 'Outfit', sans-serif;
+  }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--text); }
+  .quiz-opt.correct { background: var(--card-green); border-color: var(--accent3); color: var(--accent3); }
+  .quiz-opt.wrong { background: #2d0e0e; border-color: var(--accent2); color: var(--accent2); }
+  .quiz-feedback {
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--muted);
+    display: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--surface2);
+  }
+  .quiz-feedback.show { display: block; }
+
+  /* INTERACTIVE: SCALAR MULTIPLY */
+  .interactive-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 24px 0;
+  }
+  .interactive-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--highlight);
+    margin-bottom: 16px;
+  }
+  .controls {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .ctrl-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ctrl-label { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .ctrl-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    width: 80px;
+    outline: none;
+  }
+  .ctrl-input:focus { border-color: var(--accent); }
+  .calc-btn {
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    height: 36px;
+    align-self: flex-end;
+  }
+  .calc-btn:hover { background: #79b8ff; }
+  .result-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    min-height: 120px;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  /* MATRIX TYPES TABLE */
+  .matrix-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .matrix-type-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--surface);
+    transition: border-color 0.2s;
+  }
+  .matrix-type-card:hover { border-color: var(--accent); }
+  .mt-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .mt-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mt-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .mt-formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent4);
+    margin-bottom: 8px;
+    padding: 6px 10px;
+    background: var(--surface2);
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .mt-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .mt-quantum { font-size: 12px; color: var(--highlight); margin-top: 8px; font-style: italic; }
+
+  /* PROPERTY LIST */
+  .prop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .prop-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .prop-name {
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .prop-math {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent4);
+  }
+
+  /* SUMMARY BANNER */
+  .summary {
+    background: linear-gradient(135deg, var(--card-blue), var(--card-purple));
+    border: 1px solid rgba(88,166,255,0.3);
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin: 48px 0;
+  }
+  .summary-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: var(--accent);
+  }
+  .summary-list {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+  .summary-list li {
+    font-size: 14.5px;
+    display: flex;
+    gap: 10px;
+    color: var(--text);
+  }
+  .summary-list li::before {
+    content: '→';
+    color: var(--accent4);
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  p { margin-bottom: 14px; }
+  strong { color: var(--text); font-weight: 600; }
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent4);
+    background: var(--surface2);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 600px) {
+    .toc-list { grid-template-columns: 1fr; }
+    .prop-grid { grid-template-columns: 1fr; }
+    .hero { padding: 40px 24px 36px; }
+    .container { padding: 32px 20px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">MSE Programme · Student Notebook</div>
+  <h1>Complex Vector Spaces &amp; <em>Matrix Operations</em></h1>
+  <p class="hero-sub">A beginner-friendly guide to the mathematical foundation of quantum computing. No heavy math background needed — just curiosity.</p>
+  <div class="badges">
+    <span class="badge badge-blue">Chapter 2</span>
+    <span class="badge badge-purple">Quantum Foundations</span>
+    <span class="badge badge-green">Interactive</span>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">What you will learn</div>
+    <ul class="toc-list">
+      <li><a href="#sec1"><span class="toc-num">01</span> What is a Complex Vector Space?</a></li>
+      <li><a href="#sec2"><span class="toc-num">02</span> Vector Operations</a></li>
+      <li><a href="#sec3"><span class="toc-num">03</span> Matrices &amp; Types</a></li>
+      <li><a href="#sec4"><span class="toc-num">04</span> Inner Products &amp; Norms</a></li>
+      <li><a href="#sec5"><span class="toc-num">05</span> Hermitian &amp; Unitary Matrices</a></li>
+      <li><a href="#sec6"><span class="toc-num">06</span> Tensor Products</a></li>
+    </ul>
+  </div>
+
+
+  <!-- SECTION 1 -->
+  <div class="section" id="sec1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">What is a Complex Vector Space?</h2>
+    </div>
+
+    <p class="section-intro">Before we get into quantum computing, we need to understand the "language" it's written in. That language is complex vector spaces.</p>
+
+    <div class="callout callout-idea">
+      <div class="callout-label">Big Picture</div>
+      <p>Think of a <strong>vector</strong> like a list of numbers. In everyday life, a 2D vector could be [3, 5] — which might represent a direction on a map. In quantum computing, our vectors contain <strong>complex numbers</strong> and can have many more entries.</p>
+    </div>
+
+    <div class="callout callout-def">
+      <div class="callout-label">Definition — Complex Number</div>
+      <p>A <strong>complex number</strong> looks like <code>a + bi</code>, where <code>a</code> is the real part and <code>b</code> is the imaginary part. The symbol <code>i</code> means <code>√(−1)</code>.</p>
+      <p>Examples: <code>3 + 2i</code>, <code>−5i</code>, <code>4 + 0i</code> (which is just 4)</p>
+    </div>
+
+    <p>A <strong>Complex Vector Space Cⁿ</strong> is simply a collection of vectors of a fixed length <code>n</code>, where every entry is a complex number. The superscript tells you the length.</p>
+
+    <div class="math-block">
+      <div class="math-label">Example — A vector in C⁴</div>
+      V = [ 6 − 4i,  7 + 3i,  4.2 − 8.1i,  −3i ]ᵀ
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">Student Tip</div>
+      <p>The little <strong>T</strong> at the end (Vᵀ) just means the vector is written vertically (as a column). It's the same values — just a notation convention. In quantum computing, column vectors represent the <em>state</em> of a quantum system.</p>
+    </div>
+
+    <!-- QUIZ 1 -->
+    <div class="quiz-card">
+      <div class="quiz-q">Quick Check — Which of the following is a valid element of C²?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q1', 'Close! [3, 5] is a real vector — it belongs to ℝ², not C². Real numbers are a subset of complex numbers but we need complex entries.')">[ 3, 5 ]</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q1', 'Correct! Both entries are complex numbers (a + bi form), so this is a valid element of C².')">[ 2 + 3i, −1 + i ]</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q1', 'This has three entries so it belongs to C³, not C².')">[ i, 0, 1 ]</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 2 -->
+  <div class="section" id="sec2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Vector Operations</h2>
+    </div>
+
+    <p class="section-intro">Three basic operations define how vectors behave in a complex vector space. These are the "rules of the game".</p>
+
+    <!-- ADDITION -->
+    <div class="callout callout-def">
+      <div class="callout-label">Operation 1 — Vector Addition</div>
+      <p>Add two vectors by adding their entries at the same position. Both vectors must be the same length.</p>
+    </div>
+
+    <div class="matrix-wrap">
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr;">
+            <span>6 − 4i</span><span>7 + 3i</span><span>4.2 − 8.1i</span><span>−3i</span>
+          </div>
+        </div>
+        <div class="matrix-label">V</div>
+      </div>
+      <span class="matrix-op">+</span>
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr;">
+            <span>16 + 2.3i</span><span>−7i</span><span>6</span><span>−4i</span>
+          </div>
+        </div>
+        <div class="matrix-label">W</div>
+      </div>
+      <span class="matrix-op">=</span>
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr;">
+            <span style="color: var(--accent3);">22 − 1.7i</span><span style="color: var(--accent3);">7 − 4i</span><span style="color: var(--accent3);">10.2 − 8.1i</span><span style="color: var(--accent3);">−7i</span>
+          </div>
+        </div>
+        <div class="matrix-label">V + W</div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">Key Properties of Addition</div>
+      <p><strong>Commutative:</strong> V + W = W + V (order doesn't matter)</p>
+      <p><strong>Associative:</strong> (V + W) + X = V + (W + X) (grouping doesn't matter)</p>
+      <p><strong>Zero vector:</strong> V + 0 = V (adding zeros changes nothing)</p>
+      <p><strong>Inverse:</strong> V + (−V) = 0 (every vector has a "negative")</p>
+    </div>
+
+    <!-- SCALAR MULTIPLY -->
+    <div class="callout callout-def">
+      <div class="callout-label">Operation 2 — Scalar Multiplication</div>
+      <p>Multiply every entry in a vector by the same complex number (called a <strong>scalar</strong>). Think of it as "stretching" or "rotating" the vector.</p>
+    </div>
+
+    <!-- INTERACTIVE: SCALAR MULTIPLY -->
+    <div class="interactive-box">
+      <div class="interactive-title">Try it yourself — Scalar Multiplication</div>
+      <p style="font-size:13.5px; color: var(--muted); margin-bottom:16px;">Enter a scalar (real part + imaginary part) and see how it multiplies a vector.</p>
+      <div class="controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scalar — real part (a)</span>
+          <input class="ctrl-input" id="sc-re" type="number" value="3">
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scalar — imag part (b)</span>
+          <input class="ctrl-input" id="sc-im" type="number" value="2">
+        </div>
+        <button class="calc-btn" onclick="scalarMultiply()">Calculate</button>
+      </div>
+      <div class="result-area" id="scalar-result">
+        <span style="color: var(--muted); font-size:13px;">Click Calculate to see the result</span>
+      </div>
+    </div>
+
+    <!-- QUIZ 2 -->
+    <div class="quiz-card">
+      <div class="quiz-q">Quick Check — If V = [1 + i, 2] and we multiply by scalar 2, what is the result?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, true, 'q2', 'Correct! Each entry is multiplied by 2: 2×(1+i) = 2+2i, and 2×2 = 4.')">[ 2 + 2i, 4 ]</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q2', 'Not quite — scalar multiplication multiplies EVERY entry, not just the first.')">[ 2 + 2i, 2 ]</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q2', 'Remember: we multiply the scalar with each entry separately, not add it.')">[ 3 + i, 4 ]</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 3 -->
+  <div class="section" id="sec3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Matrices &amp; Types</h2>
+    </div>
+
+    <p class="section-intro">A matrix is a rectangular grid of numbers. In quantum computing, matrices represent the <em>operations</em> we apply to quantum states (vectors).</p>
+
+    <div class="callout callout-idea">
+      <div class="callout-label">Analogy</div>
+      <p>If a vector is the <strong>current state</strong> of a quantum system, then a matrix is the <strong>action</strong> that transforms it from one state to another. Matrix multiplication is how that transformation is applied.</p>
+    </div>
+
+    <h3 style="font-size:18px; margin: 24px 0 16px; color: var(--text);">Important Matrix Types for Quantum Computing</h3>
+
+    <div class="matrix-types">
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--accent4);"></span>
+          <span class="mt-name">Transpose (Aᵀ)</span>
+        </div>
+        <div class="mt-formula">Aᵀ[j, k] = A[k, j]</div>
+        <p class="mt-desc">Flip the matrix along its diagonal — rows become columns and columns become rows.</p>
+        <p class="mt-quantum">Used in computing inner products and norms.</p>
+      </div>
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--accent3);"></span>
+          <span class="mt-name">Conjugate (Ā)</span>
+        </div>
+        <div class="mt-formula">Ā[j, k] = conj(A[j, k])</div>
+        <p class="mt-desc">Replace every complex number entry with its complex conjugate — flip the sign of the imaginary part.</p>
+        <p class="mt-quantum">Essential for working with quantum amplitudes.</p>
+      </div>
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--highlight);"></span>
+          <span class="mt-name">Adjoint / Dagger (A†)</span>
+        </div>
+        <div class="mt-formula">A† = (Ā)ᵀ = (Aᵀ)</div>
+        <p class="mt-desc">Transpose AND conjugate together. Also written A-dagger. The most important operation in quantum mechanics.</p>
+        <p class="mt-quantum">Defines whether operators are Hermitian or Unitary.</p>
+      </div>
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--accent);"></span>
+          <span class="mt-name">Hermitian (A† = A)</span>
+        </div>
+        <div class="mt-formula">A[j, k] = conj(A[k, j])</div>
+        <p class="mt-desc">A matrix that equals its own adjoint. Diagonal entries must be real numbers.</p>
+        <p class="mt-quantum">Represents measurable physical quantities (observables) in quantum systems.</p>
+      </div>
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--accent2);"></span>
+          <span class="mt-name">Unitary (U·U† = I)</span>
+        </div>
+        <div class="mt-formula">U · U† = U† · U = I</div>
+        <p class="mt-desc">A matrix whose inverse equals its adjoint. It "preserves lengths" — applying it doesn't stretch or shrink vectors.</p>
+        <p class="mt-quantum">Represents quantum gates — reversible transformations on qubits.</p>
+      </div>
+      <div class="matrix-type-card">
+        <div class="mt-header">
+          <span class="mt-dot" style="background: var(--muted);"></span>
+          <span class="mt-name">Identity (I)</span>
+        </div>
+        <div class="mt-formula">I[j,j] = 1, rest = 0</div>
+        <p class="mt-desc">Ones on the diagonal, zeros everywhere else. Multiplying any matrix by I leaves it unchanged — like multiplying a number by 1.</p>
+        <p class="mt-quantum">Represents "do nothing" in a quantum circuit.</p>
+      </div>
+    </div>
+
+    <!-- VISUAL: ADJOINT EXAMPLE -->
+    <div class="callout callout-example">
+      <div class="callout-label">Worked Example — Computing the Adjoint</div>
+      <p>Start with matrix A. To get A†: first take the transpose (swap rows↔columns), then conjugate every entry (flip sign of imaginary parts).</p>
+    </div>
+
+    <div class="matrix-wrap" style="justify-content: flex-start; gap: 16px;">
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr 1fr;">
+            <span>3+2i</span><span>1</span>
+            <span>0</span><span>4−i</span>
+          </div>
+        </div>
+        <div class="matrix-label">A (original)</div>
+      </div>
+      <span class="matrix-op" style="font-size:18px; color: var(--muted);">→ transpose →</span>
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr 1fr;">
+            <span>3+2i</span><span>0</span>
+            <span>1</span><span>4−i</span>
+          </div>
+        </div>
+        <div class="matrix-label">Aᵀ</div>
+      </div>
+      <span class="matrix-op" style="font-size:18px; color: var(--muted);">→ conjugate →</span>
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns: 1fr 1fr; color: var(--accent3);">
+            <span>3−2i</span><span>0</span>
+            <span>1</span><span>4+i</span>
+          </div>
+        </div>
+        <div class="matrix-label">A† (adjoint)</div>
+      </div>
+    </div>
+
+    <!-- QUIZ 3 -->
+    <div class="quiz-card">
+      <div class="quiz-q">Quick Check — A Hermitian matrix must have what kind of entries on its main diagonal?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q3', 'Not quite. Complex diagonal entries would mean A ≠ A†, which would violate the Hermitian condition.')">Any complex numbers</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q3', 'Correct! For a Hermitian matrix, A[j,j] must equal conj(A[j,j]), which is only true for real numbers (where the imaginary part is zero).')">Real numbers only</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q3', 'Not quite — zero is a special case of a real number but diagonal entries can be any real value.')">All zeros</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 4 -->
+  <div class="section" id="sec4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Inner Products &amp; Norms</h2>
+    </div>
+
+    <p class="section-intro">To measure quantum states — and compare them — we need a way to "multiply" two vectors together to get a single number. That's the inner product.</p>
+
+    <div class="callout callout-def">
+      <div class="callout-label">Definition — Inner Product</div>
+      <p>For two vectors V₁ and V₂ in Cⁿ, the inner product is written <code>⟨V₁, V₂⟩</code> and computed as:</p>
+      <p style="margin-top: 10px; font-family: 'DM Mono', monospace; font-size: 14px; color: var(--accent4);">⟨V₁, V₂⟩ = V₁† · V₂</p>
+      <p style="margin-top: 8px;">Take the adjoint of the first vector, then multiply (dot product style). The result is a single complex number.</p>
+    </div>
+
+    <div class="callout callout-example">
+      <div class="callout-label">Example in ℝ³ (simpler, real numbers)</div>
+      <p>V₁ = [5, 3, −7]ᵀ and V₂ = [6, 2, 0]ᵀ</p>
+      <p style="margin-top: 8px; font-family: 'DM Mono', monospace; color: var(--accent4); font-size: 14px;">⟨V₁, V₂⟩ = (5×6) + (3×2) + (−7×0) = 30 + 6 + 0 = 36</p>
+    </div>
+
+    <div class="callout callout-def">
+      <div class="callout-label">Definition — Norm (Length)</div>
+      <p>The <strong>norm</strong> (or length) of a vector V is written |V| and is:</p>
+      <p style="margin-top: 8px; font-family: 'DM Mono', monospace; color: var(--accent4); font-size: 14px;">|V| = √⟨V, V⟩</p>
+      <p style="margin-top: 8px;">It's the "Pythagorean theorem" extended to any number of dimensions. In quantum computing, a valid quantum state always has norm = 1.</p>
+    </div>
+
+    <div class="callout callout-example">
+      <div class="callout-label">Example — Computing a Norm</div>
+      <p>V = [3, −6, 2]ᵀ</p>
+      <p style="margin-top: 8px; font-family: 'DM Mono', monospace; color: var(--accent4); font-size: 14px;">|V| = √(3² + (−6)² + 2²) = √(9 + 36 + 4) = √49 = 7</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">Why does this matter for quantum?</div>
+      <p>In quantum computing, the state of a qubit is a vector in C² with norm = 1. The inner product tells us the <strong>probability amplitude</strong> — squaring it gives the actual probability of measuring a particular outcome. This is the heart of quantum measurement.</p>
+    </div>
+
+    <!-- ORTHOGONALITY -->
+    <h3 style="font-size:17px; margin: 28px 0 14px; color: var(--text);">Orthogonality — When vectors are "perpendicular"</h3>
+    <p style="font-size:15px; color: var(--muted); margin-bottom: 16px;">Two vectors are <strong>orthogonal</strong> if their inner product equals zero. Think of it as two perpendicular arrows — they point in completely different directions.</p>
+
+    <div class="prop-grid">
+      <div class="prop-item">
+        <div class="prop-name">Orthogonal Basis</div>
+        <div class="prop-math">⟨Vⱼ, Vₖ⟩ = 0 when j ≠ k</div>
+      </div>
+      <div class="prop-item">
+        <div class="prop-name">Orthonormal Basis</div>
+        <div class="prop-math">⟨Vⱼ, Vₖ⟩ = δⱼₖ (0 or 1)</div>
+      </div>
+      <div class="prop-item">
+        <div class="prop-name">Norm = 1 condition</div>
+        <div class="prop-math">⟨Vⱼ, Vⱼ⟩ = 1</div>
+      </div>
+      <div class="prop-item">
+        <div class="prop-name">Kronecker Delta</div>
+        <div class="prop-math">δⱼₖ = 1 if j=k, else 0</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 5 -->
+  <div class="section" id="sec5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Hermitian &amp; Unitary Matrices</h2>
+    </div>
+
+    <p class="section-intro">These two matrix types are the workhorses of quantum computing. Every measurement and every gate in a quantum computer relies on one of these.</p>
+
+    <div class="callout callout-idea">
+      <div class="callout-label">Hermitian Matrices — Measuring quantum systems</div>
+      <p>A matrix H is <strong>Hermitian</strong> if H† = H (the adjoint equals itself). Key properties:</p>
+      <p style="margin-top: 8px;"><strong>1. All eigenvalues are real.</strong> This is crucial because measurements must give real numbers (you can't measure "3 + 2i seconds" on a stopwatch).</p>
+      <p style="margin-top: 8px;"><strong>2. Eigenvectors for different eigenvalues are orthogonal.</strong> Different measurement outcomes are always distinguishable.</p>
+      <p style="margin-top: 8px;"><strong>3. The Spectral Theorem</strong> guarantees Hermitian matrices have a complete set of orthonormal eigenvectors — an "eigenbasis" for the whole space.</p>
+    </div>
+
+    <div class="callout callout-idea">
+      <div class="callout-label">Unitary Matrices — Running quantum gates</div>
+      <p>A matrix U is <strong>Unitary</strong> if U · U† = I. Key properties:</p>
+      <p style="margin-top: 8px;"><strong>1. Preserves inner products.</strong> ⟨UV, UV'⟩ = ⟨V, V'⟩. Applying U doesn't change how "close" two states are.</p>
+      <p style="margin-top: 8px;"><strong>2. Preserves norms.</strong> |UV| = |V|. Valid quantum states stay valid after transformation.</p>
+      <p style="margin-top: 8px;"><strong>3. Always reversible.</strong> U† "undoes" whatever U did. All quantum operations (except measurement) are reversible.</p>
+    </div>
+
+    <div class="callout callout-example">
+      <div class="callout-label">Real-world analogy</div>
+      <p><strong>Hermitian</strong> = a weighing scale. It measures something and gives you a real number.</p>
+      <p style="margin-top: 8px;"><strong>Unitary</strong> = rotating a globe. You can spin it to any orientation and back. The globe itself doesn't change shape — it just moves.</p>
+    </div>
+
+    <!-- QUIZ 4 -->
+    <div class="quiz-card">
+      <div class="quiz-q">Quick Check — Why must quantum gates be represented by unitary matrices?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(this, false, 'q4', 'Not quite. Speed of computation is not why we use unitary matrices.')">They make computation faster</button>
+        <button class="quiz-opt" onclick="answer(this, true, 'q4', 'Exactly! Unitary matrices preserve norms, so if a quantum state has norm 1 (a valid probability), it stays at norm 1 after the gate. Also, unitary = reversible, which is a fundamental requirement of quantum operations.')">They preserve norms and are reversible</button>
+        <button class="quiz-opt" onclick="answer(this, false, 'q4', 'Unitary matrices are generally not simpler — this is not the reason.')">They are simpler to compute</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SECTION 6 -->
+  <div class="section" id="sec6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2 class="section-title">Tensor Products</h2>
+    </div>
+
+    <p class="section-intro">This is the most important concept for quantum simulation. The tensor product is how we combine two quantum systems into one larger system.</p>
+
+    <div class="callout callout-idea">
+      <div class="callout-label">Core Idea</div>
+      <p>If V describes one qubit and V' describes another qubit, then <strong>V ⊗ V'</strong> (V tensor V') describes <em>both qubits together</em> as a single system.</p>
+      <p style="margin-top: 8px;">The dimension grows fast: combining a space of dimension <strong>m</strong> and a space of dimension <strong>n</strong> gives a space of dimension <strong>m × n</strong>.</p>
+    </div>
+
+    <div class="callout callout-example">
+      <div class="callout-label">Worked Example — Tensor Product of Two Vectors</div>
+      <p>Take V = [2, 3]ᵀ from C² and W = [4, 6, 3]ᵀ from C³.</p>
+      <p style="margin-top: 8px;">Their tensor product V ⊗ W lives in C⁶ and is formed by multiplying every entry of V with the entire vector W:</p>
+    </div>
+
+    <div class="math-block">
+[ 2, 3 ]ᵀ ⊗ [ 4, 6, 3 ]ᵀ
+
+= [ 2×4, 2×6, 2×3, 3×4, 3×6, 3×3 ]ᵀ
+
+= [ 8, 12, 6, 12, 18, 9 ]ᵀ  ∈ C⁶
+    </div>
+
+    <div class="callout callout-def">
+      <div class="callout-label">Separable vs. Entangled</div>
+      <p>A vector in the combined space V ⊗ V' is called <strong>separable</strong> if it can be written as the tensor of two smaller vectors. If it <em>cannot</em> be written that way, it is called <strong>entangled</strong>.</p>
+      <p style="margin-top: 8px;">Entanglement is the famous "spooky" quantum phenomenon — where two qubits become correlated in a way that has no classical equivalent. It's the secret power behind quantum simulation and quantum cryptography.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-label">Tensor Products of Matrices</div>
+      <p>We can also take the tensor product of matrices, not just vectors. If A acts on system V and B acts on system V', then <strong>A ⊗ B</strong> acts on the combined system V ⊗ V'. This is how multi-qubit quantum gates are built.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div class="summary-title">Chapter Summary — Key Takeaways</div>
+    <ul class="summary-list">
+      <li>A <strong>complex vector space Cⁿ</strong> is a set of length-n vectors with complex entries. It's the mathematical home of quantum states.</li>
+      <li><strong>Vector addition and scalar multiplication</strong> are the two fundamental operations. Together they define the vector space structure.</li>
+      <li>The <strong>adjoint (†)</strong> combines transposing and conjugating. It's used to define Hermitian and Unitary matrices.</li>
+      <li><strong>Hermitian matrices</strong> (H† = H) represent measurements — they always have real eigenvalues.</li>
+      <li><strong>Unitary matrices</strong> (U·U† = I) represent quantum gates — they preserve norms and are reversible.</li>
+      <li>The <strong>inner product</strong> lets us measure angles, lengths, and probabilities in the vector space.</li>
+      <li>The <strong>tensor product ⊗</strong> combines two quantum systems into one — it's the mathematical foundation of entanglement and multi-qubit computing.</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--muted); font-family: 'DM Mono', monospace;">
+    MSE Programme · Complex Vector Spaces · May 2026
+  </div>
+
+</div>
+
+<script>
+  function answer(btn, correct, qId, msg) {
+    const opts = btn.parentElement.querySelectorAll('.quiz-opt');
+    opts.forEach(o => { o.disabled = true; });
+    btn.classList.add(correct ? 'correct' : 'wrong');
+    const fb = document.getElementById(qId + '-fb');
+    fb.textContent = msg;
+    fb.classList.add('show');
+  }
+
+  function complexMul(ar, ai, br, bi) {
+    return { r: ar * br - ai * bi, i: ar * bi + ai * br };
+  }
+
+  function fmt(r, i) {
+    const rs = parseFloat(r.toFixed(2));
+    const ai = parseFloat(i.toFixed(2));
+    if (ai === 0) return `${rs}`;
+    if (rs === 0) return `${ai}i`;
+    const sign = ai >= 0 ? '+' : '−';
+    return `${rs} ${sign} ${Math.abs(ai)}i`;
+  }
+
+  function scalarMultiply() {
+    const re = parseFloat(document.getElementById('sc-re').value) || 0;
+    const im = parseFloat(document.getElementById('sc-im').value) || 0;
+    const vec = [[6, 3], [0, 0], [5, 1], [4, 0]];
+    const vecLabels = ['6 + 3i', '0', '5 + i', '4'];
+    const results = vec.map(([br, bi]) => complexMul(re, im, br, bi));
+    const scalarStr = fmt(re, im);
+
+    const el = document.getElementById('scalar-result');
+    el.innerHTML = `
+      <div>
+        <div class="matrix-label" style="margin-bottom:8px;">Scalar: <span style="color:var(--highlight); font-family:'DM Mono'">(${scalarStr})</span></div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns:1fr;">
+            ${vecLabels.map(l => `<span>${l}</span>`).join('')}
+          </div>
+        </div>
+        <div class="matrix-label">Input vector</div>
+      </div>
+      <span class="matrix-op">=</span>
+      <div>
+        <div class="matrix-bracket">
+          <div class="matrix-inner" style="grid-template-columns:1fr; color: var(--accent3);">
+            ${results.map(r => `<span>${fmt(r.r, r.i)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="matrix-label">Result</div>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>
